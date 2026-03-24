@@ -111,12 +111,12 @@ const Home = ({ onNavigate }: HomeProps) => {
         {/* Navy overlay — darkens video to match site's moody palette */}
         <div className="absolute inset-0 bg-brand-navy/55 pointer-events-none" />
 
-        {/* Top fade — short feather matching the ambient champagne glow of the
-             hero above. h-[18%] (~11vh) covers only the very top edge so the
-             instructor's head remains fully visible. from-champagne/10 matches
-             the App.tsx ambient glow (bg-champagne/10 mix-blend-multiply) exactly,
-             eliminating the cold white band. */}
-        <div className="absolute inset-x-0 top-0 h-[18%] bg-gradient-to-b from-champagne/10 to-transparent pointer-events-none" />
+        {/* Top fade — starts from paper (matching the white hero above) and
+             completes within 22% (~13vh) of the container, which sits just
+             above the instructor's head at the object-[center_15%] anchor.
+             Three stops create a perceptual ease-out so it reads as a smooth
+             dissolve rather than a visible band. */}
+        <div className="absolute inset-x-0 top-0 h-[22%] bg-gradient-to-b from-paper via-paper/50 to-transparent pointer-events-none" />
 
         {/* Bottom fade — pre-blends into the oxford section directly below */}
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-oxford to-transparent pointer-events-none" />
