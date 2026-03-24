@@ -45,3 +45,20 @@ body {
     cursor: pointer;
   }
 }
+
+/* ── Mobile video pan animation ─────────────────────────────────────────────
+   On mobile only: holds on the students (center) for ~2s, then eases left
+   to the instructor (15%) over ~1.5s, then holds for the rest of the loop.
+   Timed to the 8-second video duration. Runs once; stays on instructor.
+   Desktop (md: 768px+) is unaffected — no class applied there.
+─────────────────────────────────────────────────────────────────────────── */
+@keyframes panToInstructor {
+  0%   { object-position: 35% 15%; }   /* first frame: center-left, students visible */
+  100% { object-position: 15% 15%; }   /* end: instructor centred in mobile viewport */
+}
+
+@media (max-width: 767px) {
+  .video-pan-mobile {
+    animation: panToInstructor 8s ease-in-out 1 forwards;
+  }
+}
