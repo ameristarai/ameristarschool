@@ -53,7 +53,7 @@ body {
    Desktop (md: 768px+) is unaffected — no class applied there.
 ─────────────────────────────────────────────────────────────────────────── */
 @keyframes panToInstructor {
-  0%   { object-position: 35% 15%; }   /* first frame: center-left, students visible */
+  0%   { object-position: 25% 15%; }   /* first frame: center-left, students visible */
   100% { object-position: 15% 15%; }   /* end: instructor centred in mobile viewport */
 }
 
