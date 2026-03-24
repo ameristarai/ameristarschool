@@ -56,7 +56,7 @@ body {
    slides left to 0 (revealing instructor at object-position 15%).
    transform is GPU-composited on all browsers; object-position is not. */
 @keyframes panToInstructor {
-  0%   { transform: translateX(25%); }
+  0%   { transform: translateX(35%); }
   100% { transform: translateX(0);   }
 }
 
