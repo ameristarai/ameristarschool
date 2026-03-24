@@ -28,22 +28,69 @@ const MID:   [number,number,number] = [180, 180, 180];
 
 // ── Human-readable course labels ──────────────────────────────────────────────
 export const COURSE_LABELS: Record<string, string> = {
-  'ins-ethics':     '12-Hr Ethics & CA Insurance Code (Required)',
-  'ins-life-health':'Life & Health Insurance (52 Hrs)',
-  'ins-pc':         'Property & Casualty Insurance (52 Hrs)',
-  'ins-ce':         'Insurance CE Package (Provider 409s99)',
-  're-principles':  'Real Estate Principles (45 Hrs, Required)',
-  're-practice':    'Real Estate Practice (45 Hrs, Required)',
-  're-finance':     'Real Estate Finance (45 Hrs)',
-  're-ce':          '45-Hour Real Estate CE Package',
-  'nmls-20':        'NMLS 20-Hr Pre-Licensing (Required)',
-  'nmls-8':         'NMLS 8-Hr Annual CE (Renewal)',
+  // Insurance Pre-License
+  'ins-life-health':    '12-Hr Ethics for Life & Health Insurance (52 Hrs)',
+  'ins-pc':             '12-Hr Ethics for Property & Casualty Insurance (52 Hrs)',
+  'ins-practice-exams': 'Practice Exams',
+  // Insurance Continuing Education
+  'ins-ce-principles':  'Insurance Principles (15 Hrs)',
+  'ins-ce-medicare':    'Medicare, COBRA, Disability Plans (15 Hrs)',
+  'ins-ce-annuity-10':  'Understanding Annuity Plans (10 Hrs)',
+  'ins-ce-health':      'Health Insurance Principles (10 Hrs)',
+  'ins-ce-annuity-8':   '2025 – 8-Hr Annuity Training (8 Hrs)',
+  'ins-ce-ltc':         'California Long-Term Care (8 Hrs)',
+  'ins-ce-ethics-1':    'Ethical Responsibilities (5 Hrs)',
+  'ins-ce-ethics-2':    'Ethics: The Guide to Success (5 Hrs)',
+  'ins-ce-annuity-4':   '2025 – 4-Hr Annuity Training (4 Hrs)',
+  'ins-ce-aml':         'Anti-Money Laundering (4 Hrs)',
+  'ins-ce-life-4':      '4-Hr Life Insurance (4 Hrs)',
+  'ins-ce-variable-2':  '2-Hr Variable Life Insurance (2 Hrs)',
+  // Real Estate Pre-License
+  're-principles':      'Real Estate Principles (45 Hrs, Required)',
+  're-practice':        'Real Estate Practice (45 Hrs, Required)',
+  're-finance':         'Real Estate Finance (45 Hrs)',
+  're-practice-exams':  'Practice Exams',  // ⚠️ price unconfirmed
+  // Real Estate Continuing Education
+  're-ce':              '45-Hour CE Package (License Renewal)',
+  // NMLS
+  'nmls-20':            'NMLS 20-Hr Pre-Licensing (Required)',
+  'nmls-8':             'NMLS 8-Hr Annual CE (Renewal)',
+};
+
+// ── Per-course prices — mirrors pricing constants in Enrollment.tsx ───────────
+export const COURSE_PRICES: Record<string, number> = {
+  // Insurance Pre-License — $150
+  'ins-life-health':    150,
+  'ins-pc':             150,
+  'ins-practice-exams': 150,
+  // Insurance CE — $50
+  'ins-ce-principles':  50,
+  'ins-ce-medicare':    50,
+  'ins-ce-annuity-10':  50,
+  'ins-ce-health':      50,
+  'ins-ce-annuity-8':   50,
+  'ins-ce-ltc':         50,
+  'ins-ce-ethics-1':    50,
+  'ins-ce-ethics-2':    50,
+  'ins-ce-annuity-4':   50,
+  'ins-ce-aml':         50,
+  'ins-ce-life-4':      50,
+  'ins-ce-variable-2':  50,
+  // Real Estate Pre-License — $99
+  're-principles':      99,
+  're-practice':        99,
+  're-finance':         99,
+  // Real Estate Practice Exams — $150 (⚠️ unconfirmed)
+  're-practice-exams':  150,
+  // Real Estate CE — $285
+  're-ce':              285,
+  // NMLS — $100
+  'nmls-20':            100,
+  'nmls-8':             100,
 };
 
 // ── Human-readable payment labels ────────────────────────────────────────────
 export const PAYMENT_LABELS: Record<string, string> = {
-  cash:   'Cash',
-  check:  'Check (payable to Ameristar School)',
   credit: 'Credit Card',
   zelle:  'Zelle — (626) 308-0150',
 };
@@ -322,15 +369,31 @@ export function generateEnrollmentPDF(data: PDFFormData, totals: PDFTotals): jsP
     doc.text('No courses selected.', ML + 4, y);
     y += 10;
   } else {
-    // Group by category
-    const groups: Array<{ heading: string; ids: string[] }> = [
+    // Groups with optional sub-headings for Pre-License / CE sections
+    const groups: Array<{ heading: string; subheading?: string; ids: string[] }> = [
       {
         heading: 'Insurance Certification',
-        ids: ['ins-ethics', 'ins-life-health', 'ins-pc', 'ins-ce'],
+        subheading: 'Pre-License',
+        ids: ['ins-life-health', 'ins-pc', 'ins-practice-exams'],
+      },
+      {
+        heading: 'Insurance Certification',
+        subheading: 'Continuing Education',
+        ids: [
+          'ins-ce-principles', 'ins-ce-medicare',  'ins-ce-annuity-10', 'ins-ce-health',
+          'ins-ce-annuity-8',  'ins-ce-ltc',       'ins-ce-ethics-1',   'ins-ce-ethics-2',
+          'ins-ce-annuity-4',  'ins-ce-aml',       'ins-ce-life-4',     'ins-ce-variable-2',
+        ],
       },
       {
         heading: 'Real Estate Certification',
-        ids: ['re-principles', 're-practice', 're-finance', 're-ce'],
+        subheading: 'Pre-License',
+        ids: ['re-principles', 're-practice', 're-finance', 're-practice-exams'],
+      },
+      {
+        heading: 'Real Estate Certification',
+        subheading: 'Continuing Education',
+        ids: ['re-ce'],
       },
       {
         heading: 'NMLS Certification',
@@ -338,16 +401,31 @@ export function generateEnrollmentPDF(data: PDFFormData, totals: PDFTotals): jsP
       },
     ];
 
+    let lastHeading = '';
     groups.forEach(group => {
       const selected = data.selectedCourses.filter(c => group.ids.includes(c));
       if (selected.length === 0) return;
 
-      checkPage(10, pageNum);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.5);
-      doc.setTextColor(...GOLD);
-      doc.text(group.heading.toUpperCase(), ML + 2, y);
-      y += 5;
+      // Print main heading only when it changes
+      if (group.heading !== lastHeading) {
+        checkPage(10, pageNum);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.5);
+        doc.setTextColor(...GOLD);
+        doc.text(group.heading.toUpperCase(), ML + 2, y);
+        y += 5;
+        lastHeading = group.heading;
+      }
+
+      // Print sub-heading if present
+      if (group.subheading) {
+        checkPage(7, pageNum);
+        doc.setFont('helvetica', 'bolditalic');
+        doc.setFontSize(7);
+        doc.setTextColor(...MID);
+        doc.text(group.subheading, ML + 4, y);
+        y += 4.5;
+      }
 
       selected.forEach(courseId => {
         checkPage(7, pageNum);
@@ -356,9 +434,22 @@ export function generateEnrollmentPDF(data: PDFFormData, totals: PDFTotals): jsP
         doc.setTextColor(...DARK);
         // Bullet
         doc.setFillColor(...GOLD);
-        doc.circle(ML + 4, y - 1.2, 1, 'F');
-        doc.text(COURSE_LABELS[courseId] || courseId, ML + 8, y);
-        y += 6;
+        doc.circle(ML + 6, y - 1.2, 1, 'F');
+        // Course label — left
+        doc.text(COURSE_LABELS[courseId] || courseId, ML + 10, y);
+        // Price — right-justified
+        const price = COURSE_PRICES[courseId];
+        if (price !== undefined) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(9);
+          doc.text(`$${price.toFixed(2)}`, PW - MR - 2, y, { align: 'right' });
+          doc.setFont('helvetica', 'normal');
+        }
+        // Light separator line
+        doc.setDrawColor(...LIGHT);
+        doc.setLineWidth(0.2);
+        doc.line(ML + 10, y + 2, PW - MR, y + 2);
+        y += 6.5;
       });
       y += 2;
     });
@@ -374,34 +465,22 @@ export function generateEnrollmentPDF(data: PDFFormData, totals: PDFTotals): jsP
   }
   sectionHeader('03 · Payment Summary', pageNum);
 
-  // Light background box — tall enough to include Payment Method with comfortable spacing
-  checkPage(88, pageNum);
+  // Light background box — Courses + Registration Fee + Total + Payment Method
+  checkPage(64, pageNum);
   doc.setFillColor(...LIGHT);
-  doc.rect(ML, y, CW, 86, 'F');
+  doc.rect(ML, y, CW, 62, 'F');
   doc.setDrawColor(...MID);
   doc.setLineWidth(0.3);
-  doc.rect(ML, y, CW, 86, 'S');
+  doc.rect(ML, y, CW, 62, 'S');
   y += 4;
 
   summaryRow(
-    `Courses (${data.selectedCourses.length} × $100.00)`,
+    `Courses (${data.selectedCourses.length})`,
     totals.courseSubtotal,
     false,
     pageNum
   );
   summaryRow('Registration Fee (Non-Refundable)', totals.registrationFee, false, pageNum);
-  summaryRow(
-    `Physical Materials${data.wantsMaterials ? '' : ' (Not Selected)'}`,
-    data.wantsMaterials ? totals.materialsSubtotal : null,
-    false,
-    pageNum
-  );
-  summaryRow(
-    `Shipping${data.wantsShipping && data.wantsMaterials ? '' : ' (Not Selected)'}`,
-    data.wantsShipping && data.wantsMaterials ? totals.shippingSubtotal : null,
-    false,
-    pageNum
-  );
   y += 2;
   summaryRow('TOTAL DUE', totals.grandTotal, true, pageNum);
 
