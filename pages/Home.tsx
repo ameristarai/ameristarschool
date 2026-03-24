@@ -103,7 +103,7 @@ const Home = ({ onNavigate }: HomeProps) => {
           loop
           playsInline
           preload="metadata"
-          className="absolute inset-0 w-full h-full object-cover object-[center_15%]"
+          className="absolute inset-0 w-full h-full object-cover object-[15%_15%] md:object-[center_15%] video-pan-mobile"
         >
           <source src="/shirley-miao-hg1.mp4" type="video/mp4" />
         </video>
