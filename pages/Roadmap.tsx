@@ -216,7 +216,7 @@ const MindMapNode = ({ node, depth, expandedNodes, onExpandedChange }: MindMapNo
   return (
     <div className="relative animate-fade-in">
       {/* Node row */}
-      <div className={`flex items-start gap-4 mb-4 ${depth > 0 ? 'ml-8' : ''}`}>
+      <div className={`flex items-start gap-4 mb-4 ${depth > 0 ? 'ml-2 md:ml-8' : ''}`}>
 
         {/* Horizontal connector line */}
         {depth > 0 && (
@@ -227,7 +227,7 @@ const MindMapNode = ({ node, depth, expandedNodes, onExpandedChange }: MindMapNo
         <div
           onClick={toggle}
           className={[
-            'relative z-10 flex-1 p-5 rounded-xl border transition-all duration-300 group',
+            'relative z-10 flex-1 p-3 md:p-5 rounded-xl border transition-all duration-300 group',
             hasChildren
               ? 'cursor-pointer hover:border-champagne hover:shadow-lg hover:bg-white'
               : 'cursor-default bg-gray-50/50',
@@ -280,11 +280,11 @@ const MindMapNode = ({ node, depth, expandedNodes, onExpandedChange }: MindMapNo
 
       {/* Children */}
       {hasChildren && isExpanded && (
-        <div className={`relative ${depth > 0 ? 'ml-8' : ''}`}>
+        <div className={`relative ${depth > 0 ? 'ml-2 md:ml-8' : ''}`}>
           {/* Vertical trunk line */}
           <div className="absolute left-8 top-0 bottom-8 w-px bg-champagne/30" />
 
-          <div className="pl-8 pt-2">
+          <div className="pl-2 md:pl-8 pt-2">
             {node.children!.map((child) => (
               <MindMapNode
                 key={child.id}
