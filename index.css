@@ -52,9 +52,12 @@ body {
    Timed to the 8-second video duration. Runs once; stays on instructor.
    Desktop (md: 768px+) is unaffected — no class applied there.
 ─────────────────────────────────────────────────────────────────────────── */
+/* translateX pan — shifts video rightward at start (showing students),
+   slides left to 0 (revealing instructor at object-position 15%).
+   transform is GPU-composited on all browsers; object-position is not. */
 @keyframes panToInstructor {
-  0%   { object-position: 25% 15%; }   /* first frame: center-left, students visible */
-  100% { object-position: 15% 15%; }   /* end: instructor centred in mobile viewport */
+  0%   { transform: translateX(25%); }
+  100% { transform: translateX(0);   }
 }
 
 @media (max-width: 767px) {
